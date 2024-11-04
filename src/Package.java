@@ -1,44 +1,32 @@
-public class Package {
 
-    private Center center;
-    private String content;
+public class Package<X> {
 
-    private Package next;
-    private Package prev;
+    private X data;
 
+    private Package<X> next;
+    private Package<X> prev;
 
-    public Package(Center center, String content) {
-        this.center = center;
-        this.content = content;
+    public Package(X data){
+        this.data = data;
     }
 
-    public Package getNext(){
-        return this.next;
+    public void setData(X data){
+        this.data = data;
     }
-    public Package getPrev(){
-        return this.prev;
+    public X getData(){
+        return data;
     }
-    public void setNext(Package p){
-        this.next = p;
+
+    public void setNext(Package<X> next){
+        this.next = next;
     }
-    public void setPrev(Package p){
-        this.prev = p;
+    public Package<X> getNext(){
+        return next;
     }
-    public Center getCity(){
-        return center;
+    public void setPrev(Package<X> prev){
+        this.prev = prev;
     }
-    public void setCity(Center center) {
-        this.center = center;
-    }
-    public String getContent(){
-        try {
-            return content;
-        } catch (Exception e){
-            System.out.println("ERROR: " + e.getMessage());
-            return null;
-        }
-    }
-    public void setContent(String content){
-        this.content = content;
+    public Package<X> getPrev(){
+        return prev;
     }
 }

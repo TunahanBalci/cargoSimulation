@@ -1,36 +1,32 @@
 public class Center {
 
-    private Center prev;
-    private Center next;
-
     private String name;
 
-    public Center(String name) {
+    public Center (String name){
         this.name = name;
     }
 
-    public Center getNext(){
-        return this.next;
+    private DoublyLinkedList<Package> packages = new DoublyLinkedList<Package>();
+    private DoublyLinkedList<Vehicle> vehicles = new DoublyLinkedList<Vehicle>();
+
+    public void addVehicle(Node v){
+        vehicles.push(v);
     }
-    public Center getPrev(){
-        return this.prev;
-    }
-    public void setNext(Center c){
-        this.next = c;
-    }
-    public void setPrev(Center c){
-        this.prev = c;
+
+    public void addPackage(Node n){
+        packages.push(n);
     }
 
     public String getName(){
-        try {
-            return name;
-        } catch (Exception e){
-            System.out.println("ERROR: " + e.getMessage());
-            return null;
-        }
+        return name;
     }
-    public void setName(String name){
-        this.name = name;
+
+    public DoublyLinkedList<Vehicle> vehicles(){
+        return vehicles;
     }
+    public DoublyLinkedList<Package> packages(){
+        return packages;
+    }
+
+
 }
