@@ -1,14 +1,77 @@
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
 
-        File input_packages = new File("packages.txt");
-        File input_vehicles = new File("vehicles.txt");
-        File input_missions = new File("missions.txt");
-        File input_cities = new File("cities.txt");
+        Scanner scanner = new Scanner(System.in);
+
+        File input_packages = null;
+        File input_vehicles = null;
+        File input_missions = null;
+        File input_cities = null;
+        File input_result = null;
+
+        while (true) {
+            System.out.println("-------------------------------------");
+            System.out.println("\nPROVIDE PATH FOR CITIES, PACKAGES, VEHICLES, MISSIONS AND RESULT \n");
+            System.out.println("-------------------------------------");
+
+            System.out.println("\n ENTER PATH FOR CITIES.TXT: ");
+            String cities_path = scanner.nextLine();
+            try {
+                input_cities = new File(cities_path);
+            } catch (Exception e) {
+                continue;
+            }
+
+
+            System.out.println("\n ENTER PATH FOR PACKAGES.TXT: ");
+            String packages_path = scanner.nextLine();
+            try {
+                input_packages = new File(packages_path);
+            } catch (Exception e) {
+                System.out.println("ERR: COULD NOT FIND FILE");
+                continue;
+            }
+
+            System.out.println("\n ENTER PATH FOR VEHICLES.TXT: ");
+            String vehicles_path = scanner.nextLine();
+            try {
+                input_vehicles = new File(vehicles_path);
+            } catch (Exception e) {
+                System.out.println("ERR: COULD NOT FIND FILE");
+                continue;
+            }
+
+            System.out.println("\n ENTER PATH FOR MISSIONS.TXT: ");
+            String missions_path = scanner.nextLine();
+            try {
+                input_missions = new File(missions_path);
+            } catch (Exception e) {
+                System.out.println("ERR: COULD NOT FIND FILE");
+                continue;
+            }
+
+            System.out.println("\n ENTER PATH FOR RESULT.TXT: ");
+            String result_path = scanner.nextLine();
+            try {
+                input_result = new File(result_path);
+            } catch (Exception e) {
+                System.out.println("ERR: COULD NOT FIND FILE");
+                continue;
+            }
+
+
+            if (input_packages == null || input_vehicles == null || input_missions == null || input_cities == null) {
+                System.out.println("ERR: COULD NOT FIND FILE");
+                continue;
+            } else {
+                break;
+            }
+        }
 
         DoublyLinkedList<Center> cities = new DoublyLinkedList<>();
 
@@ -18,7 +81,6 @@ public class Main {
             Scanner sc = new Scanner(input_cities);
             while (sc.hasNextLine()) {
                 String line = sc.nextLine();
-//                System.out.println(line);
                 cities.push(new Node<Center>(new Center(line)));
             }
             sc.close();
@@ -58,7 +120,6 @@ public class Main {
                 String[] vehicleCityCombo = line.split(" ");
 
                 Node<Center> currentCity = cities.getFirst();
-//                System.out.println("CURRENT CITY: " + currentCity.getSelf().getName());
                 while (currentCity != null) {
                     if (currentCity.getSelf().getName().equals(vehicleCityCombo[1])) {
                         currentCity.getSelf().addVehicle(new Node<Vehicle>(new Vehicle(vehicleCityCombo[0], Double.parseDouble(vehicleCityCombo[2]))));
@@ -73,7 +134,7 @@ public class Main {
 
         // Read missions.txt
         // Move vehicles and packages, do mission operations
-        try {
+
             Scanner sc = new Scanner(input_missions);
             while (sc.hasNextLine()) {
                 String line = sc.nextLine();
@@ -82,16 +143,14 @@ public class Main {
                 mission.operate(line, cities);
             }
 
-        } catch (Exception e) {
-            System.out.println("ERR: COULD  S S S NOT READ FILE: " + e.getMessage());
-        }
 
-        generateOutput(cities);
+
+        generateOutput(cities, input_result);
     }
 
-    public static void generateOutput(DoublyLinkedList<Center> cities) {
+    public static void generateOutput(DoublyLinkedList<Center> cities, File file) {
         try {
-            FileWriter writer = new FileWriter("output.txt");
+            FileWriter writer = new FileWriter(file);
 
             Node<Center> currentCity = cities.getFirst();
             while (currentCity != null) {
@@ -101,7 +160,9 @@ public class Main {
 
                 // Write header of packages
                 writer.write("Packages:\n");
+
                 Node<Package> currentPackage = currentCity.getSelf().packages().getFirst();
+                System.out.println("CURRENT PACKAGE: " + currentPackage.getSelf().getData());
 
                 // Write packages
                 while (currentPackage != null) {
@@ -122,6 +183,8 @@ public class Main {
                     writer.write("\n");
                     currentVehicle = currentVehicle.getNext();
                 }
+                //Write seperation line
+                writer.write("-------------\n");
                 currentCity = currentCity.getNext();
             }
             writer.close();

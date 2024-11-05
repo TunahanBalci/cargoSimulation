@@ -6,6 +6,9 @@ public class Node <T>{
     private T self;
 
     public Node (T self){
+        if (self == null){
+            throw new IllegalArgumentException("Node cannot be null");
+        }
         this.self = self;
     }
 

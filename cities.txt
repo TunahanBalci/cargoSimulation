@@ -1,6 +1,3 @@
 Berlin
 Hamburg
-Cologne
-Frankfurt
-Dusseldorf
-Stuttgart
+Munich

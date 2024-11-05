@@ -1,32 +1,32 @@
 
-public class Package<X> {
+public class Package<KKK> {
 
-    private X data;
+    private KKK data;
 
-    private Package<X> next;
-    private Package<X> prev;
+    private Package<KKK> next;
+    private Package<KKK> prev;
 
-    public Package(X data){
+    public Package(KKK data){
         this.data = data;
     }
 
-    public void setData(X data){
+    public void setData(KKK data){
         this.data = data;
     }
-    public X getData(){
+    public KKK getData(){
         return data;
     }
 
-    public void setNext(Package<X> next){
+    public void setNext(Package<KKK> next){
         this.next = next;
     }
-    public Package<X> getNext(){
+    public Package<KKK> getNext(){
         return next;
     }
-    public void setPrev(Package<X> prev){
+    public void setPrev(Package<KKK> prev){
         this.prev = prev;
     }
-    public Package<X> getPrev(){
+    public Package<KKK> getPrev(){
         return prev;
     }
 }
