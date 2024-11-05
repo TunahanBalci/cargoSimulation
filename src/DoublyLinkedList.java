@@ -112,7 +112,6 @@ public class DoublyLinkedList<CUSTOM_TYPE> {
         }
     }
 
-
     public void removeSpecific(Node<CUSTOM_TYPE> x) {
         Node<CUSTOM_TYPE> current = first;
         while (current != null) {
@@ -165,5 +164,4 @@ public class DoublyLinkedList<CUSTOM_TYPE> {
         }
         return -1; // Return -1 if the value is not found
     }
-
 }

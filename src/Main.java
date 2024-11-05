@@ -7,7 +7,6 @@ public class Main {
     public static void main(String[] args) throws FileNotFoundException {
 
         Scanner scanner = new Scanner(System.in);
-
         File input_packages = null;
         File input_vehicles = null;
         File input_missions = null;
@@ -22,11 +21,12 @@ public class Main {
             System.out.println("\n ENTER PATH FOR CITIES.TXT: ");
             String cities_path = scanner.nextLine();
             try {
+                if (!(new File(cities_path).exists())) {
+                }
                 input_cities = new File(cities_path);
             } catch (Exception e) {
                 continue;
             }
-
 
             System.out.println("\n ENTER PATH FOR PACKAGES.TXT: ");
             String packages_path = scanner.nextLine();
@@ -64,7 +64,6 @@ public class Main {
                 continue;
             }
 
-
             if (input_packages == null || input_vehicles == null || input_missions == null || input_cities == null) {
                 System.out.println("ERR: COULD NOT FIND FILE");
                 continue;
@@ -98,7 +97,7 @@ public class Main {
 
                 Node<Center> currentCity = cities.getFirst();
                 while (currentCity != null) {
-                    if (currentCity.getSelf().getName().equals(packageCityCombo[1])){
+                    if (currentCity.getSelf().getName().equals(packageCityCombo[1])) {
                         currentCity.getSelf().addPackage(new Node<Package<String>>(new Package<String>(packageCityCombo[0])));
                     }
                     currentCity = currentCity.getNext();
@@ -109,10 +108,8 @@ public class Main {
             System.out.println("ERR: COULD NOT READ FILE: " + e.getMessage());
         }
 
-
         // Read vehicles.txt
         // Add vehicles to cities
-
         try {
             Scanner sc = new Scanner(input_vehicles);
             while (sc.hasNextLine()) {
@@ -134,16 +131,12 @@ public class Main {
 
         // Read missions.txt
         // Move vehicles and packages, do mission operations
-
-            Scanner sc = new Scanner(input_missions);
-            while (sc.hasNextLine()) {
-                String line = sc.nextLine();
-
-                Mission mission = new Mission();
-                mission.operate(line, cities);
-            }
-
-
+        Scanner sc = new Scanner(input_missions);
+        while (sc.hasNextLine()) {
+            String line = sc.nextLine();
+            Mission mission = new Mission();
+            mission.operate(line, cities);
+        }
 
         generateOutput(cities, input_result);
     }
@@ -166,7 +159,7 @@ public class Main {
 
                 // Write packages
                 while (currentPackage != null) {
-                    if (currentPackage.getSelf() != null && currentPackage.getSelf().getData() != null){
+                    if (currentPackage.getSelf() != null && currentPackage.getSelf().getData() != null) {
                         writer.write(currentPackage.getSelf().getData().toString());
                     }
                     writer.write("\n");
@@ -177,13 +170,14 @@ public class Main {
                 writer.write("Vehicles:\n");
                 Node<Vehicle> currentVehicle = currentCity.getSelf().vehicles().getFirst();
                 while (currentVehicle != null) {
-                    if (currentVehicle.getSelf() != null && currentVehicle.getSelf().getName() != null){
+                    if (currentVehicle.getSelf() != null && currentVehicle.getSelf().getName() != null) {
                         writer.write(currentVehicle.getSelf().getName());
                     }
                     writer.write("\n");
                     currentVehicle = currentVehicle.getNext();
                 }
-                //Write seperation line
+
+                // Write separation line
                 writer.write("-------------\n");
                 currentCity = currentCity.getNext();
             }

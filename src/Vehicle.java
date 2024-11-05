@@ -1,48 +1,51 @@
-public class Vehicle{
+public class Vehicle {
 
     private String name;
     private double priority;
-
     private Vehicle next;
     private Vehicle prev;
-
     private DoublyLinkedList<Package> cargo = new DoublyLinkedList<>();
 
-    Vehicle (String name, double priority){
+    Vehicle(String name, double priority) {
         this.name = name;
         this.priority = priority;
     }
-    public void setNext(Vehicle next){
+
+    public void setNext(Vehicle next) {
         this.next = next;
     }
-    public Vehicle getNext(){
+
+    public Vehicle getNext() {
         return next;
     }
-    public void setPrev(Vehicle prev){
+
+    public void setPrev(Vehicle prev) {
         this.prev = prev;
     }
-    public Vehicle getPrev(){
+
+    public Vehicle getPrev() {
         return prev;
     }
-    public double getPriority(){
+
+    public double getPriority() {
         return priority;
     }
-    public void setPriority(double priority){
+
+    public void setPriority(double priority) {
         this.priority = priority;
     }
 
     public void pickUp(Center center) {
         Node<Package> packageNode = center.packages().pop(); // Attempt to remove the package from the center
         if (packageNode == null) {
-            System.out.println("WARNING: NO PACKAGE - Vehicle/pickUp" + center.getName());
+            System.out.println("WARNING: NO PACKAGE - Vehicle/pickUp " + center.getName());
             return; // Avoid pushing null nodes to cargo
         }
-        cargo.push(packageNode);  // Add the package to the vehicle's cargo
+        cargo.push(packageNode); // Add the package to the vehicle's cargo
         System.out.println("INFO: Picked up " + packageNode.getSelf().getData() + " from " + center.getName());
     }
 
-
-    public void dropOff(Center center){
+    public void dropOff(Center center) {
         Node<Package> n = cargo.getFirst();
         cargo.removeFirst();
         center.packages().addFirst(n);
@@ -60,14 +63,15 @@ public class Vehicle{
         }
     }
 
-    public String getName(){
+    public String getName() {
         return name;
     }
-    public int size(){
+
+    public int size() {
         return cargo.size();
     }
-    public DoublyLinkedList cargo(){
+
+    public DoublyLinkedList<Package> cargo() {
         return cargo;
     }
 }
-
