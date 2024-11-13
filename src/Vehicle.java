@@ -1,77 +1,65 @@
+import java.util.Arrays;
+
 public class Vehicle {
 
-    private String name;
+    Stack<Package> packages = new Stack<>();
     private double priority;
-    private Vehicle next;
-    private Vehicle prev;
-    private DoublyLinkedList<Package> cargo = new DoublyLinkedList<>();
+    private String name;
 
-    Vehicle(String name, double priority) {
+    public Vehicle(String name, double priority) {
         this.name = name;
         this.priority = priority;
     }
 
-    public void setNext(Vehicle next) {
-        this.next = next;
+    public void pickUp(City city, int count) {
+        for (int i = 0; i < count; i++) {
+            Package p = city.packages().pop();
+            packages.push(p);
+            if (Tester.DEBUG_VEHICLE_INFO){
+                Utils.printInfo("Vehicle " + name + " picked up package " + p + " from " + city.name());
+            }
+        }
     }
 
-    public Vehicle getNext() {
-        return next;
+    public void deliverIndices(City city, int[] indices) {
+        Arrays.sort(indices);
+        for (int i = 0; i < indices.length; i++) {
+            Package p = packages.removeIndex(indices[i] - i);
+            city.packages().push(p);
+
+            if (Tester.DEBUG_VEHICLE_INFO){
+                Utils.printInfo("Vehicle " + name + " __index_delivered__ package " + p + " to " + city.name() + " - index = " + (indices[i] - i));
+            }
+        }
     }
 
-    public void setPrev(Vehicle prev) {
-        this.prev = prev;
+    public void deliverAll(City city) {
+
+        Queue<Package> temp = new Queue<>();
+        while (!packages.isEmpty()) {
+            temp.enqueue(packages.pop());
+        }
+        while (!temp.isEmpty()) {
+            packages.push(temp.dequeue());
+        }
+        while (!packages.isEmpty()) {
+            Package p = packages.pop();
+            city.packages().push(p);
+            if (Tester.DEBUG_VEHICLE_INFO){
+                Utils.printInfo("Vehicle " + name + " delivered package " + p + " to " + city.name());
+            }
+        }
     }
 
-    public Vehicle getPrev() {
-        return prev;
-    }
-
-    public double getPriority() {
+    public double priority() {
         return priority;
     }
 
-    public void setPriority(double priority) {
-        this.priority = priority;
-    }
-
-    public void pickUp(Center center) {
-        Node<Package> packageNode = center.packages().pop(); // Attempt to remove the package from the center
-        if (packageNode == null) {
-            System.out.println("WARNING: NO PACKAGE - Vehicle/pickUp " + center.getName());
-            return; // Avoid pushing null nodes to cargo
-        }
-        cargo.push(packageNode); // Add the package to the vehicle's cargo
-        System.out.println("INFO: Picked up " + packageNode.getSelf().getData() + " from " + center.getName());
-    }
-
-    public void dropOff(Center center) {
-        Node<Package> n = cargo.getFirst();
-        cargo.removeFirst();
-        center.packages().addFirst(n);
-    }
-
-    public void dropOffIndex(Center center, int index) {
-        if (index < 0 || index >= cargo.size()) {
-            System.out.println("WARNING: INVALID INDEX - Vehicle/Dropoff");
-            return;
-        }
-        Node<Package> packageNode = cargo.get(index);
-        if (packageNode != null) {
-            center.packages().addFirst(new Node<>(packageNode.getSelf()));
-            cargo.remove(index);
-        }
-    }
-
-    public String getName() {
+    public String name() {
         return name;
     }
 
-    public int size() {
-        return cargo.size();
-    }
-
-    public DoublyLinkedList<Package> cargo() {
-        return cargo;
+    public String toString() {
+        return name;
     }
 }

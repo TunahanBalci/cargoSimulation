@@ -1,123 +1,66 @@
-import java.util.Arrays;
-
 public class Mission {
 
-    public static Vehicle getPrioritizedVehicle(DoublyLinkedList<Vehicle> vehicles) {
-        if (vehicles.size() == 0) {
-            System.out.println("ERROR: NO VEHICLE");
-            return null;
-        }
-        try {
-            if (vehicles.size() == 1) {
-                return vehicles.getFirst().getSelf();
-            }
+    private City sourceCity;
+    private City middleCity;
+    private City destinationCity;
+    private int sourcePickup;
+    private int middlePickup;
+    private int [] middleDrop;
 
-            Node<Vehicle> current = vehicles.getFirst();
-            Vehicle prioritizedVehicle = current.getSelf();
-
-            while (current != null) {
-                if (current.getSelf().getPriority() > prioritizedVehicle.getPriority()) {
-                    prioritizedVehicle = current.getSelf();
-                }
-                current = current.getNext();
-            }
-            return prioritizedVehicle;
-        } catch (Exception e) {
-            System.out.println("ERROR: " + e.getMessage());
-        }
-
-        return null;
+    Mission(City sourceCity, City middleCity, City destinationCity, int sourcePickup, int middlePickup, int [] middleDrop){
+        this.sourceCity = sourceCity;
+        this.middleCity = middleCity;
+        this.destinationCity = destinationCity;
+        this.sourcePickup = sourcePickup;
+        this.middlePickup = middlePickup;
+        this.middleDrop = middleDrop;
     }
 
-    public void operate(String line, DoublyLinkedList<Center> centers) {
-        String[] missionCityCombo = line.split("-");
-        int sourcePickupCount = Integer.parseInt(missionCityCombo[3]);
-        int middlePickupCount = Integer.parseInt(missionCityCombo[4]);
+    public void execute(){
 
-        Center[] cities = new Center[3];
-        assignCities(centers, cities, missionCityCombo);
+        Vehicle vehicle = sourceCity.getPriortyVehicle();;
 
-        String[] middleDropOff_String = missionCityCombo[5].split(",");
-        int[] indexList_middleDropOff = new int[middleDropOff_String.length];
-        for (int i = 0; i < middleDropOff_String.length; i++) {
-            indexList_middleDropOff[i] = Integer.parseInt(middleDropOff_String[i]);
+        vehicle.pickUp(sourceCity, sourcePickup);
+
+        sourceCity.removeVehicle(vehicle);
+
+        middleCity.addVehicle(vehicle);
+//        middleCity.debug(); //DEBUG
+
+        City tempCity = new City("TEMP");
+
+        vehicle.deliverIndices(tempCity, middleDrop); // delivers to tempcity
+        vehicle.pickUp(middleCity, middlePickup);
+
+        while (!tempCity.packages().isEmpty()){
+            Package p = tempCity.packages().removeFromBack();
+//            System.out.println("TRANSFERING " + p + " FROM TEMP TO MIDDLE"); //DEBUG
+            middleCity.packages().push(p);
+        }
+        middleCity.removeVehicle(vehicle);
+
+        destinationCity.addVehicle(vehicle);
+        vehicle.deliverAll(destinationCity);
+
+        if (Tester.DEBUG_MISSION_INFO){
+            Utils.printInfo(" --- MISSION ENDED ---");
         }
 
-        // Sort the drop-off indexes
-        Arrays.sort(indexList_middleDropOff);
-
-        Vehicle session_vehicle = getPrioritizedVehicle(cities[0].vehicles());
-
-        // Add packages from source city to preferred vehicle in source city
-        for (int i = 0; i < sourcePickupCount; i++) {
-            session_vehicle.pickUp(cities[0]);
-        }
-
-        System.out.println(session_vehicle.cargo().peek().getSelf());
-
-        // Add vehicle to middle city
-        cities[1].addVehicle(new Node<Vehicle>(session_vehicle));
-
-        // Remove vehicle from source city
-        try {
-            cities[0].vehicles().remove(cities[0].vehicles().indexOf(session_vehicle));
-        } catch (Exception e) {
-            System.out.println("COULD NOT REMOVE VEHICLE FROM SOURCE CITY: " + e.getMessage());
-        }
-
-        // Drop off packages in a temporary city to avoid concurrent modification
-        Center tempCity = new Center("temp");
-        System.out.println("Middle dropoff count: " + indexList_middleDropOff.length);
-        for (int i = 0; i < indexList_middleDropOff.length; i++) {
-            int adjustedIndex = indexList_middleDropOff[i] - i;
-            session_vehicle.dropOffIndex(tempCity, adjustedIndex);
-        }
-
-        // Load vehicle in middle city
-        System.out.println("Middle pickup count: " + middlePickupCount);
-        for (int i = 0; i < middlePickupCount; i++) {
-            session_vehicle.pickUp(cities[1]);
-        }
-
-        // Transfer packages from temp city to middle city
-        for (int i = 0; i < indexList_middleDropOff.length; i++) {
-            cities[1].packages().addFirst(tempCity.packages().pop());
-        }
-
-        // Add vehicle to destination city
-        cities[2].addVehicle(new Node<Vehicle>(session_vehicle));
-
-        // Remove vehicle from middle city
-        try {
-            cities[1].vehicles().remove(cities[1].vehicles().indexOf(session_vehicle));
-        } catch (Exception e) {
-            System.out.println("COULD NOT REMOVE VEHICLE FROM MIDDLE CITY: " + e.getMessage());
-        }
-
-        // Drop off packages in destination city
-        while (session_vehicle.size() > 0) {
-            session_vehicle.dropOff(cities[2]);
-        }
+//        sourceCity.debug(); //DEBUG
+//        middleCity.debug(); //DEBUG
+//        destinationCity.debug(); //DEBUG
     }
 
-    public void assignCities(DoublyLinkedList<Center> centers, Center[] cities, String[] missionCityCombo) {
-        Node<Center> temp = centers.getFirst();
-        for (int i = 0; i < 3; i++) {
-            while (temp != null) {
-                if (temp.getSelf().getName().equals(missionCityCombo[i])) {
-                    cities[i] = temp.getSelf();
-                    break;
-                }
-                temp = temp.getNext();
+    @Override
+    public String toString(){
+        String middleDropString = "[";
+        for (int i = 0; i < middleDrop.length; i++){
+            if (i == middleDrop.length - 1){
+                middleDropString += middleDrop[i] + "]";
+                break;
             }
+            middleDropString += middleDrop[i] + ",";
         }
-    }
-
-    public void removeFromCity(Center city, Vehicle vehicle) {
-        try {
-            city.vehicles().remove(city.vehicles().indexOf(vehicle));
-        } catch (Exception e) {
-            System.out.println("COULD NOT REMOVE VEHICLE FROM CITY: " + e.getMessage());
-        }
+        return sourceCity.name() + " - " + middleCity.name() + " - " + destinationCity.name() + " - " + sourcePickup + " - " + middlePickup + " - " + middleDropString;
     }
 }
